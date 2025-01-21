@@ -222,6 +222,19 @@ Redux::setSection( $houzez_opt_name, array(
     'subsection' => true,
     'fields' => array(
         array(
+            'id'      => 'property_form_sections_custom',
+            'type'     => 'checkbox',
+            'title'    => esc_html__( 'Use Custom Layout?', 'houzez' ),
+            'desc'     => '',
+            'subtitle' => esc_html__('Check this option to use custom layout', 'houzez'),
+            'options'  => array(
+                'property_form_is_custom' => esc_html__('Custom Form Design', 'houzez'),                
+            ),
+            'default' => array(
+                'property_form_is_custom' => '0',                
+            )
+        ),
+        array(
             'id'      => 'property_form_sections',
             'type'    => 'sorter',
             'title'   => 'Add New Property Form Layout Manager',

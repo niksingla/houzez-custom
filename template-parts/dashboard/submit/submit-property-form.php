@@ -79,75 +79,74 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             </div>
 
             <?php
-            $layout = houzez_option('property_form_sections');
-            $layout = $layout['enabled'];
-            
-            ?>
-            <script>
-                console.log(<?php echo json_encode($layout)?>);
-                
-            </script>
-            <?php
 
-            if ($layout): foreach ($layout as $key=>$value) {
-
-                switch($key) {
-
-                    case 'description-price':
-                        get_template_part('template-parts/dashboard/submit/description-and-price');
-                        break;
-
-                    case 'media':
-                        get_template_part('template-parts/dashboard/submit/media');
-                        break;
-
-                    case 'details':
-                        get_template_part('template-parts/dashboard/submit/details');
-                        break;
-
-                    case 'energy_class':
-                        get_template_part('template-parts/dashboard/submit/energy-class');
-                        break;
-
-                    case 'features':
-                        get_template_part('template-parts/dashboard/submit/features');
-                        break;
-
-                    case 'location':
-                        get_template_part('template-parts/dashboard/submit/location');
-                        break;
-                    
-                    case 'virtual_tour':
-                        get_template_part('template-parts/dashboard/submit/360-virtual-tour');
-                        break;
-
-                    case 'floorplans':
-                        get_template_part('template-parts/dashboard/submit/floor', 'plans');
-                        break;
-
-                    case 'multi-units':
-                        get_template_part('template-parts/dashboard/submit/sub-properties');
-                        break;
-
-                    case 'agent_info':
-                        if(houzez_show_agent_box()) {
-                            get_template_part('template-parts/dashboard/submit/contact-information');
-                        }
-                        break;
-
-                    case 'private_note':
-                        get_template_part('template-parts/dashboard/submit/private-note');
-                        break;
-
-                    case 'attachments':
-                        get_template_part('template-parts/dashboard/submit/attachments');
-                        break;
-
-
+            $is_custom_enabled = houzez_option('property_form_sections_custom');
+            if(isset($is_custom_enabled) && !empty($is_custom_enabled) && isset($is_custom_enabled['property_form_is_custom']) && $is_custom_enabled['property_form_is_custom']){                                
+                get_template_part('template-parts/custom-create-listing');
+            } else {
+                $layout = houzez_option('property_form_sections');
+                $layout = $layout['enabled'];
+    
+                if ($layout): foreach ($layout as $key=>$value) {
+    
+                    switch($key) {
+    
+                        case 'description-price':
+                            get_template_part('template-parts/dashboard/submit/description-and-price');
+                            break;
+    
+                        case 'media':
+                            get_template_part('template-parts/dashboard/submit/media');
+                            break;
+    
+                        case 'details':
+                            get_template_part('template-parts/dashboard/submit/details');
+                            break;
+    
+                        case 'energy_class':
+                            get_template_part('template-parts/dashboard/submit/energy-class');
+                            break;
+    
+                        case 'features':
+                            get_template_part('template-parts/dashboard/submit/features');
+                            break;
+    
+                        case 'location':
+                            get_template_part('template-parts/dashboard/submit/location');
+                            break;
+                        
+                        case 'virtual_tour':
+                            get_template_part('template-parts/dashboard/submit/360-virtual-tour');
+                            break;
+    
+                        case 'floorplans':
+                            get_template_part('template-parts/dashboard/submit/floor', 'plans');
+                            break;
+    
+                        case 'multi-units':
+                            get_template_part('template-parts/dashboard/submit/sub-properties');
+                            break;
+    
+                        case 'agent_info':
+                            if(houzez_show_agent_box()) {
+                                get_template_part('template-parts/dashboard/submit/contact-information');
+                            }
+                            break;
+    
+                        case 'private_note':
+                            get_template_part('template-parts/dashboard/submit/private-note');
+                            break;
+    
+                        case 'attachments':
+                            get_template_part('template-parts/dashboard/submit/attachments');
+                            break;
+    
+    
+                    }
+    
                 }
-
+                endif;
             }
-            endif;
 
             if( houzez_is_admin() || houzez_is_editor() ) {
                 get_template_part('template-parts/dashboard/submit/settings');
