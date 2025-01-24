@@ -683,4 +683,205 @@ if( ! function_exists( 'houzez_is_mobile_filter' ) ) {
 	//add_filter( 'wp_is_mobile', 'houzez_is_mobile_filter' );
 }
 
+/*-----------------------------------------------------------------------------------*/
+/*   Upload property floor images
+/*-----------------------------------------------------------------------------------*/
+add_action( 'wp_ajax_houzez_floorplan_img_upload', 'houzez_floorplan_img_upload' );    // only for logged in user
+add_action( 'wp_ajax_nopriv_houzez_floorplan_img_upload', 'houzez_floorplan_img_upload' );
+if( !function_exists( 'houzez_floorplan_img_upload' ) ) {
+    function houzez_floorplan_img_upload( ) {
 
+        // Check security Nonce
+        $verify_nonce = $_REQUEST['verify_nonce'];
+        if ( ! wp_verify_nonce( $verify_nonce, 'verify_gallery_nonce' ) ) {
+            echo json_encode( array( 'success' => false , 'reason' => 'Invalid nonce!' ) );
+            die;
+        }
+
+        $submitted_file = $_FILES['floorplan_upload_file'];
+        $uploaded_image = wp_handle_upload( $submitted_file, array( 'test_form' => false ) );
+
+        if ( isset( $uploaded_image['file'] ) ) {
+            $file_name          =   basename( $submitted_file['name'] );
+            $file_type          =   wp_check_filetype( $uploaded_image['file'] );
+
+            // Prepare an array of post data for the attachment.
+            $attachment_details = array(
+                'guid'           => $uploaded_image['url'],
+                'post_mime_type' => $file_type['type'],
+                'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $file_name ) ),
+                'post_content'   => '',
+                'post_status'    => 'inherit'
+            );
+
+            $attach_id      =   wp_insert_attachment( $attachment_details, $uploaded_image['file'] );
+            $attach_data    =   wp_generate_attachment_metadata( $attach_id, $uploaded_image['file'] );
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+
+            $user_id = get_current_user_id();
+            $watermark_image_url = get_user_meta($user_id, 'fave_watermark_image', true);
+            
+
+            $thumbnail_url = wp_get_attachment_image_src( $attach_id, 'houzez-item-image-1' );
+
+            $feat_image_url = wp_get_attachment_url( $attach_id );
+
+            $ajax_response = array(
+                'success'   => true,
+                'url' => $thumbnail_url[0],
+                'attachment_id'    => $attach_id,
+                'full_image'    => $feat_image_url
+            );
+
+            echo json_encode( $ajax_response );
+            die;
+
+        } else {
+            $ajax_response = array( 'success' => false, 'reason' => 'Image upload failed!' );
+            echo json_encode( $ajax_response );
+            die;
+        }
+
+    }
+}
+
+/*-----------------------------------------------------------------------------------*/
+/*   Upload property brochure images
+/*-----------------------------------------------------------------------------------*/
+add_action( 'wp_ajax_houzez_brochure_img_upload', 'houzez_brochure_img_upload' );    // only for logged in user
+add_action( 'wp_ajax_nopriv_houzez_brochure_img_upload', 'houzez_brochure_img_upload' );
+if( !function_exists( 'houzez_brochure_img_upload' ) ) {
+    function houzez_brochure_img_upload( ) {
+
+        // Check security Nonce
+        $verify_nonce = $_REQUEST['verify_nonce'];
+        if ( ! wp_verify_nonce( $verify_nonce, 'verify_gallery_nonce' ) ) {
+            echo json_encode( array( 'success' => false , 'reason' => 'Invalid nonce!' ) );
+            die;
+        }
+
+        $submitted_file = $_FILES['brochure_upload_file'];
+        $uploaded_image = wp_handle_upload( $submitted_file, array( 'test_form' => false ) );
+
+        if ( isset( $uploaded_image['file'] ) ) {
+            $file_name          =   basename( $submitted_file['name'] );
+            $file_type          =   wp_check_filetype( $uploaded_image['file'] );
+
+            // Prepare an array of post data for the attachment.
+            $attachment_details = array(
+                'guid'           => $uploaded_image['url'],
+                'post_mime_type' => $file_type['type'],
+                'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $file_name ) ),
+                'post_content'   => '',
+                'post_status'    => 'inherit'
+            );
+
+            $attach_id      =   wp_insert_attachment( $attachment_details, $uploaded_image['file'] );
+            $attach_data    =   wp_generate_attachment_metadata( $attach_id, $uploaded_image['file'] );
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+
+            $user_id = get_current_user_id();
+            $watermark_image_url = get_user_meta($user_id, 'fave_watermark_image', true);
+            
+
+            $thumbnail_url = wp_get_attachment_image_src( $attach_id, 'houzez-item-image-1' );
+
+            $feat_image_url = wp_get_attachment_url( $attach_id );
+
+            $ajax_response = array(
+                'success'   => true,
+                'url' => $thumbnail_url[0],
+                'attachment_id'    => $attach_id,
+                'full_image'    => $feat_image_url
+            );
+
+            echo json_encode( $ajax_response );
+            die;
+
+        } else {
+            $ajax_response = array( 'success' => false, 'reason' => 'Image upload failed!' );
+            echo json_encode( $ajax_response );
+            die;
+        }
+
+    }
+}
+/*-----------------------------------------------------------------------------------*/
+/*   Upload seller images
+/*-----------------------------------------------------------------------------------*/
+add_action( 'wp_ajax_houzez_seller_photo_img_upload', 'houzez_seller_photo_img_upload' );    // only for logged in user
+add_action( 'wp_ajax_nopriv_houzez_seller_photo_img_upload', 'houzez_seller_photo_img_upload' );
+if( !function_exists( 'houzez_seller_photo_img_upload' ) ) {
+    function houzez_seller_photo_img_upload( ) {
+
+        // Check security Nonce
+        $verify_nonce = $_REQUEST['verify_nonce'];
+        if ( ! wp_verify_nonce( $verify_nonce, 'verify_gallery_nonce' ) ) {
+            echo json_encode( array( 'success' => false , 'reason' => 'Invalid nonce!' ) );
+            die;
+        }
+
+        $submitted_file = $_FILES['seller_photo_upload_file'];
+        $uploaded_image = wp_handle_upload( $submitted_file, array( 'test_form' => false ) );
+
+        if ( isset( $uploaded_image['file'] ) ) {
+            $file_name          =   basename( $submitted_file['name'] );
+            $file_type          =   wp_check_filetype( $uploaded_image['file'] );
+
+            // Prepare an array of post data for the attachment.
+            $attachment_details = array(
+                'guid'           => $uploaded_image['url'],
+                'post_mime_type' => $file_type['type'],
+                'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $file_name ) ),
+                'post_content'   => '',
+                'post_status'    => 'inherit'
+            );
+
+            $attach_id      =   wp_insert_attachment( $attachment_details, $uploaded_image['file'] );
+            $attach_data    =   wp_generate_attachment_metadata( $attach_id, $uploaded_image['file'] );
+            wp_update_attachment_metadata( $attach_id, $attach_data );
+
+            $user_id = get_current_user_id();
+            $watermark_image_url = get_user_meta($user_id, 'fave_watermark_image', true);
+            
+
+            $thumbnail_url = wp_get_attachment_image_src( $attach_id, 'houzez-item-image-1' );
+
+            $feat_image_url = wp_get_attachment_url( $attach_id );
+
+            $ajax_response = array(
+                'success'   => true,
+                'url' => $thumbnail_url[0],
+                'attachment_id'    => $attach_id,
+                'full_image'    => $feat_image_url
+            );
+
+            echo json_encode( $ajax_response );
+            die;
+
+        } else {
+            $ajax_response = array( 'success' => false, 'reason' => 'Image upload failed!' );
+            echo json_encode( $ajax_response );
+            die;
+        }
+
+    }
+}
+
+function custom_add_property_enqueue_scripts(){
+	if(houzez_is_dashboard()) {
+		$type_flpn_files = implode(',', houzez_option('type_flpn_files', []));
+		$max_flpn_images = houzez_option('max_flpn_images', 10);
+		$type_fmktbrch_files = implode(',', houzez_option('type_fmktbrch_files', []));
+		$max_mktbrch_files = houzez_option('max_mktbrch_files', 1);
+		$data = [
+			'type_flpn_files'     => $type_flpn_files,
+			'max_flpn_images'     => $max_flpn_images,
+			'type_fmktbrch_files' => $type_fmktbrch_files,
+			'max_mktbrch_files'   => $max_mktbrch_files,
+		];
+		wp_localize_script('houzez_property', 'customPropertyFields', $data);
+
+	}
+}
+add_action( 'wp_enqueue_scripts', 'custom_add_property_enqueue_scripts' );

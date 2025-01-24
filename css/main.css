@@ -13256,7 +13256,7 @@ input.multiple-agent-check {
 
 /* property-thumb
 /* ------------------------------------------------------------------------ */
-.max-limit-error {
+.max-limit-error, .max-limit-error2, .max-limit-error3, .max-limit-error4 {
   display: none;
   color: #c31b1b;
 }

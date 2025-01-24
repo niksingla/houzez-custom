@@ -42,11 +42,7 @@ function add_property_types_to_taxonomy() {
 $adp_details_fields = houzez_option('adp_details_fields');
 $fields_builder = $adp_details_fields['enabled'];
 unset($fields_builder['placebo']);
-?>
-<script>
-    console.log(<?php echo json_encode($fields_builder);?>);    
-</script>
-<?php
+
 if ($fields_builder) {
 
     function get_custom_field_from_field_builder($key){
@@ -130,6 +126,15 @@ if ($fields_builder) {
             padding:0;
             margin:0;
         }
+        .dashboard-add-new-listing .add-new-listing-bottom-nav-wrap{
+            z-index: 10;
+        }
+        <?php
+        if(! is_admin()){ 
+            echo '.dashboard-content-wrap .order-2{
+                display:none!important;
+            }';
+        } ?>
     </style>
     <div id="description-price" class="dashboard-content-block-wrap custom-dashboard-layout <?php echo esc_attr($is_multi_steps);?>">
         <div class="dashboard-content-block">
@@ -462,8 +467,9 @@ if ($fields_builder) {
                 <?php
                 $gallery_image_req = houzez_option('gallery_image_req', 1);
 
-                ?>            
-                <div class="col-md-6 col-sm-12">
+                ?>
+                <!-- Property Photos -->
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <label>Photos</label>                                            
                     <div class="upload-media-gallery">
                         <div id="houzez_property_gallery_container" class="row">            
@@ -512,7 +518,7 @@ if ($fields_builder) {
                             }
                             ?>
                         </div>
-                    </div>        
+                    </div>
                     <div class="upload-property-media">
                         <div id="houzez_gallery_dragDrop" class="media-drag-drop">
                             <div class="upload-icon">
@@ -529,16 +535,238 @@ if ($fields_builder) {
                         <div id="houzez_errors"></div>
                         <div class="max-limit-error">The maximum file upload limit has been reached.</div>
                     </div>                    
+                </div> 
+                <!-- Floorplan Description -->
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label>Floorplan Description</label>
+                    <div class="upload-media-gallery">
+                        <div id="houzez_property_floorplan_container" class="row">            
+                            <?php
+                            $property_images_count = 0;
+                            if(houzez_edit_property()) {
+                                $property_images = get_post_meta( $property_data->ID, 'fave_floorplan_images', false );
+        
+                                if ( ! empty( $property_images ) ) {
+                                    $property_images_count = count( array_filter( $property_images ) );
+                                }
+            
+        
+                                $featured_image_id = get_post_thumbnail_id( $property_data->ID );
+                                $property_images[] = $featured_image_id;
+                                $property_images = array_unique($property_images);
+        
+                                if( !empty($property_images[0])) {
+                                    foreach ($property_images as $prop_image_id) {
+        
+                                        $is_featured_image = ($featured_image_id == $prop_image_id);
+                                        $featured_icon = ($is_featured_image) ? 'text-success' : '';
+        
+                                        $img_available = wp_get_attachment_image($prop_image_id, 'thumbnail');
+        
+                                        if( !empty($img_available)) {
+                                            echo '<div class="col-md-2 col-sm-4 col-6 property-thumb">';
+                                            echo wp_get_attachment_image($prop_image_id, 'houzez-item-image-1', false, array('class' => 'img-fluid'));
+                                            echo '<div class="upload-gallery-thumb-buttons">';
+                                            echo '<button class="icon icon-fav icon-featured" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><i class="houzez-icon icon-rating-star full-star '.esc_attr($featured_icon).'"></i></button>';
+    
+                                            echo '<button class="icon icon-delete" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>';
+                                            echo '</div>';
+        
+                                            echo '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' . intval($prop_image_id) . '"/>';
+        
+                                            if ($is_featured_image) {
+                                                echo '<input type="hidden" class="featured_image_id" name="featured_image_id" value="' . intval($prop_image_id) . '">';
+                                            }
+                                            
+                                            echo '</div>';
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div class="upload-property-media">
+                        <div id="houzez_gallery_dragDrop2" class="media-drag-drop">
+                            <div class="upload-icon">
+                                <i class="houzez-icon icon-picture-sun"></i>
+                            </div>
+                            <div class="upload-image-counter2" bis_skin_checked="1"><span class="uploaded">0</span> / <?php echo houzez_option('max_flpn_images'); ?></div>
+                            <div>
+                                Drop Floorplan Description Images Here<br>
+                                <span>(Minimum size 1440x900)</span><br>                                
+                            </div>
+                            <a id="select_floorplan_images" href="javascript:;" class="btn btn-primary btn-left-icon"><i class="houzez-icon icon-upload-button mr-1"></i> <?php echo houzez_option('cl_image_btn', 'Select and Upload'); ?></a>
+                        </div>
+                        <div id="houzez_errors2"></div>
+                        <div class="max-limit-error2">The maximum file upload limit has been reached.</div>
+                    </div>                    
                 </div>
-                <div class="col-md-6 col-sm-12">
+                <!-- Marketing Brochure -->
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label>Marketing Brochure</label>
+                    <div class="upload-media-gallery">
+                        <div id="houzez_property_brochure_container" class="row">            
+                            <?php
+                            $property_images_count = 0;
+                            if(false && houzez_edit_property()) {
+                                $property_images = get_post_meta( $property_data->ID, 'fave_brochure_images', false );
+        
+                                if ( ! empty( $property_images ) ) {
+                                    $property_images_count = count( array_filter( $property_images ) );
+                                }
+            
+        
+                                $featured_image_id = get_post_thumbnail_id( $property_data->ID );
+                                $property_images[] = $featured_image_id;
+                                $property_images = array_unique($property_images);
+        
+                                if( !empty($property_images[0])) {
+                                    foreach ($property_images as $prop_image_id) {
+        
+                                        $is_featured_image = ($featured_image_id == $prop_image_id);
+                                        $featured_icon = ($is_featured_image) ? 'text-success' : '';
+        
+                                        $img_available = wp_get_attachment_image($prop_image_id, 'thumbnail');
+        
+                                        if( !empty($img_available)) {
+                                            echo '<div class="col-md-2 col-sm-4 col-6 property-thumb">';
+                                            echo wp_get_attachment_image($prop_image_id, 'houzez-item-image-1', false, array('class' => 'img-fluid'));
+                                            echo '<div class="upload-gallery-thumb-buttons">';
+                                            echo '<button class="icon icon-fav icon-featured" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><i class="houzez-icon icon-rating-star full-star '.esc_attr($featured_icon).'"></i></button>';
+    
+                                            echo '<button class="icon icon-delete" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>';
+                                            echo '</div>';
+        
+                                            echo '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' . intval($prop_image_id) . '"/>';
+        
+                                            if ($is_featured_image) {
+                                                echo '<input type="hidden" class="featured_image_id" name="featured_image_id" value="' . intval($prop_image_id) . '">';
+                                            }
+                                            
+                                            echo '</div>';
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div class="upload-property-media">
+                        <div id="houzez_gallery_dragDrop3" class="media-drag-drop">
+                            <div class="upload-icon">
+                                <i class="houzez-icon icon-picture-sun"></i>
+                            </div>
+                            <div class="upload-image-counter3" bis_skin_checked="1"><span class="uploaded">0</span> / <?php echo houzez_option('max_mktbrch_files', 1); ?></div>
+                            <div>
+                                Drop Brochure Files Here<br>
+                                <span>(Minimum size 1440x900)</span><br>                                
+                            </div>
+                            <a id="select_brochure_images" href="javascript:;" class="btn btn-primary btn-left-icon"><i class="houzez-icon icon-upload-button mr-1"></i> <?php echo houzez_option('cl_image_btn', 'Select and Upload'); ?></a>
+                        </div>
+                        <div id="houzez_errors3"></div>
+                        <div class="max-limit-error3">The maximum file upload limit has been reached.</div>
+                    </div>                    
+                </div>                
+                <!-- Seller Photo -->
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <label>Seller Photo</label>
+                    <div class="upload-media-gallery">
+                        <div id="houzez_property_seller_photo_container" class="row">            
+                            <?php
+                            $property_images_count = 0;
+                            if(false && houzez_edit_property()) {
+                                $property_images = get_post_meta( $property_data->ID, 'fave_seller_photo_images', false );
+        
+                                if ( ! empty( $property_images ) ) {
+                                    $property_images_count = count( array_filter( $property_images ) );
+                                }
+            
+        
+                                $featured_image_id = get_post_thumbnail_id( $property_data->ID );
+                                $property_images[] = $featured_image_id;
+                                $property_images = array_unique($property_images);
+        
+                                if( !empty($property_images[0])) {
+                                    foreach ($property_images as $prop_image_id) {
+        
+                                        $is_featured_image = ($featured_image_id == $prop_image_id);
+                                        $featured_icon = ($is_featured_image) ? 'text-success' : '';
+        
+                                        $img_available = wp_get_attachment_image($prop_image_id, 'thumbnail');
+        
+                                        if( !empty($img_available)) {
+                                            echo '<div class="col-md-2 col-sm-4 col-6 property-thumb">';
+                                            echo wp_get_attachment_image($prop_image_id, 'houzez-item-image-1', false, array('class' => 'img-fluid'));
+                                            echo '<div class="upload-gallery-thumb-buttons">';
+                                            echo '<button class="icon icon-fav icon-featured" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><i class="houzez-icon icon-rating-star full-star '.esc_attr($featured_icon).'"></i></button>';
+    
+                                            echo '<button class="icon icon-delete" data-property-id="' . intval($property_data->ID) . '" data-attachment-id="' . intval($prop_image_id) . '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>';
+                                            echo '</div>';
+        
+                                            echo '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' . intval($prop_image_id) . '"/>';
+        
+                                            if ($is_featured_image) {
+                                                echo '<input type="hidden" class="featured_image_id" name="featured_image_id" value="' . intval($prop_image_id) . '">';
+                                            }
+                                            
+                                            echo '</div>';
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div class="upload-property-media">
+                        <div id="houzez_gallery_dragDrop4" class="media-drag-drop">
+                            <div class="upload-icon">
+                                <i class="houzez-icon icon-picture-sun"></i>
+                            </div>
+                            <div class="upload-image-counter4" bis_skin_checked="1"><span class="uploaded">0</span> / 1</div>
+                            <div>
+                                Drop Seller Photo Here<br>
+                                <span>(Minimum size 1440x900)</span><br>                                
+                            </div>
+                            <a id="select_seller_photo_images" href="javascript:;" class="btn btn-primary btn-left-icon"><i class="houzez-icon icon-upload-button mr-1"></i> <?php echo houzez_option('cl_image_btn', 'Select and Upload'); ?></a>
+                        </div>
+                        <div id="houzez_errors4"></div>
+                        <div class="max-limit-error4">The maximum file upload limit has been reached.</div>
+                    </div>                    
+                </div>
+                <!-- Video (URL) -->               
+                <div class="col-lg-4 col-md-6 col-sm-12">
                     <?php if( $hide_prop_fields['video_url'] != 1 ) { ?>
                     <label><?php echo houzez_option('cls_video', 'Video'); ?></label>
                     <div class="dashboard-content-block">
                         <?php get_template_part('template-parts/dashboard/submit/form-fields/video'); ?>
                     </div><!-- dashboard-content-block -->
                     <?php } ?>
-                </div>                            
-            </div> <!-- media wrap -->
+                </div>
+                <!-- Seller Name -->                
+                <?php
+                    $key = 'seller-name';
+                    if(in_array($key, houzez_details_section_fields())){ ?>
+                        <div class="col-md-4 col-sm-12">
+                            <div class="form-group">
+                                <?php                                 
+                                    if(in_array($key, houzez_details_section_fields())) get_custom_field_from_field_builder($key); 
+                                ?>
+                            </div>
+                        </div>
+                        <?php
+                    }else {
+                        echo '<div class="col-md-4 col-sm-12">';
+                        echo '<div class="form-group">';                    
+                            houzez_get_custom_add_listing_field($key);
+                        echo '</div></div>';
+                    }
+                ?>                
+            </div>
+             <!-- media wrap -->
         </div>
         <?php if(false){ ?>
             <h2><?php echo houzez_option('cls_description', 'Description'); ?></h2>

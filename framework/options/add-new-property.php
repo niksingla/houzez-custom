@@ -1,6 +1,22 @@
 <?php
 global $houzez_opt_name, $custom_fields_array;
 
+function get_allowed_file_types() {
+    $file_types = [
+        'jpg'  => 'JPG',
+        'jpeg' => 'JPEG',
+        'png'  => 'PNG',
+        'gif'  => 'GIF',
+        'pdf'  => 'PDF',
+        'doc'  => 'DOC',
+        'docx' => 'DOCX',
+        'xls'  => 'XLS',
+        'xlsx' => 'XLSX',
+    ];
+
+    return $file_types;
+}
+
 Redux::setSection( $houzez_opt_name, array(
     'title'  => esc_html__( 'Add New Property', 'houzez' ),
     'id'     => 'add-property-page',
@@ -187,6 +203,40 @@ Redux::setSection( $houzez_opt_name, array(
             'desc'     => '',
             'subtitle' => esc_html__('Maximum images allow for single property.', 'houzez'),
             'default' => '50'
+        ),
+        array(
+            'id'       => 'type_flpn_files',
+            'type'     => 'select',
+            'title'    => esc_html__('Floorplan description allowed File Types', 'houzez'),
+            'desc'     => esc_html__('Select all allowed file types.', 'houzez'),
+            'subtitle' => esc_html__('You can select multiple file types allowed for Floorplan description upload.', 'houzez'),
+            'options'  => get_allowed_file_types(),
+            'multi'    => true,
+        ),
+        array(
+            'id'       => 'max_flpn_images',
+            'type'     => 'text',
+            'title'    => esc_html__( 'Maximum Files', 'houzez' ),
+            'desc'     => '',
+            'subtitle' => esc_html__('Maximum Files allow for Floorplan description.', 'houzez'),
+            'default' => '10'
+        ),
+        array(
+            'id'       => 'type_fmktbrch_files',
+            'type'     => 'select',
+            'title'    => esc_html__('Marketing Brochure allowed File Types', 'houzez'),
+            'desc'     => esc_html__('Select all allowed file types.', 'houzez'),
+            'subtitle' => esc_html__('You can select multiple file types allowed for Marketing Brochure upload.', 'houzez'),
+            'options'  => get_allowed_file_types(),
+            'multi'    => true,
+        ),
+        array(
+            'id'       => 'max_mktbrch_files',
+            'type'     => 'text',
+            'title'    => esc_html__( 'Maximum Files', 'houzez' ),
+            'desc'     => '',
+            'subtitle' => esc_html__('Maximum Files allow for Marketing Brochure.', 'houzez'),
+            'default' => '1'
         ),
         array(
             'id'       => 'image_max_file_size',

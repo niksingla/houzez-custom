@@ -1361,7 +1361,7 @@ jQuery(document).ready( function($) {
             galleryUploader.bind('FilesAdded', function(up, files) {
                 var houzez_thumbs = "";
                 var maxfiles = max_prop_images; // maximum number of files allowed
-                var totalFiles  = $( '.property-thumb' ).length; // current number of files in the gallery
+                var totalFiles  = parseInt($(this.settings.container).find('.uploaded').text()) // current number of files in the gallery
 
                 // Check if the total number of files exceeds the maximum allowed
                 if ( totalFiles >= maxfiles ) {
@@ -1384,7 +1384,7 @@ jQuery(document).ready( function($) {
                 }
 
                 // Update the number of uploaded files
-                $( '.upload-image-counter .uploaded' ).text( $( '.property-thumb' ).length );
+                $( '.upload-image-counter .uploaded' ).text( parseInt($(this.settings.container).find('.uploaded').text()) + 1 );
             });
 
             // Handle the upload progress
@@ -1442,6 +1442,323 @@ jQuery(document).ready( function($) {
                 }
             });
             
+            var type_flpn_files = customPropertyFields.type_flpn_files;
+            var max_flpn_images = customPropertyFields.max_flpn_images;
+            var type_fmktbrch_files = customPropertyFields.type_fmktbrch_files;
+            var max_mktbrch_files = customPropertyFields.max_mktbrch_files;
+            
+            
+            
+            // Initialize plupload for uploading gallery images
+            var galleryUploader2 = new plupload.Uploader({
+                browse_button: 'select_floorplan_images', // ID of the button to open the file picker dialog
+                file_data_name: 'floorplan_upload_file', // name of the file input field
+                container: 'houzez_gallery_dragDrop2', // ID of the container element to add drag-and-drop functionality
+                drop_element: 'houzez_gallery_dragDrop2', // ID of the element to add drop-area functionality
+                url: ajax_url + "?action=houzez_floorplan_img_upload&verify_nonce=" + verify_nonce, // URL to handle the image upload
+                filters: {
+                    mime_types : [
+                        { title : verify_file_type, extensions : type_flpn_files } // allowed file types
+                    ],
+                    max_file_size: image_max_file_size, // maximum file size
+                    prevent_duplicates: false // allow or disallow duplicate files
+                }
+            });
+
+            // Initialize the plupload
+            galleryUploader2.init();
+
+            // When files are added to the file queue
+            galleryUploader2.bind('FilesAdded', function(up, files) {
+                console.log(galleryUploader2.settings);
+                var houzez_thumbs = "";
+                var maxfiles = max_flpn_images; // maximum number of files allowed
+                var totalFiles  = parseInt($(this.settings.container).find('.uploaded').text()) // current number of files in the gallery
+
+                // Check if the total number of files exceeds the maximum allowed
+                if ( totalFiles >= maxfiles ) {
+                    $( '.max-limit-error2' ).show(); // show error message
+                    up.splice(); // remove the excess files from the file queue
+                    return false;
+
+                } else {
+
+                    var uploads             = files.slice( 0, ( maxfiles - totalFiles ) );
+                    var thumbnailsContainer = document.getElementById( 'houzez_property_floorplan_container' );
+
+                    // Add a thumbnail of the file to the gallery
+                    plupload.each( uploads, function ( file ) {
+                        thumbnailsContainer.innerHTML += '<div id="thumb-holder-2-' + file.id + '" class="col-md-2 col-sm-4 col-6 property-thumb houzez-during-upload">' + '' + '</div>';
+                    } );
+
+                    up.refresh();
+                    galleryUploader2.start();
+                }
+
+                // Update the number of uploaded files
+                $( '.upload-image-counter2 .uploaded' ).text( parseInt($(this.settings.container).find('.uploaded').text()) + 1 );
+            });
+
+            // Handle the upload progress
+            galleryUploader2.bind('UploadProgress', function(up, file) {
+
+                var holder     = document.getElementById( "thumb-holder-2-" + file.id ),
+                    imageThumb = $( '.property-thumb' ),
+                    height     = 150;
+
+                if( holder ) {
+
+                    if( imageThumb.length ) {
+                        height = imageThumb.first().height();
+                    }
+                }
+
+                // Update the progress bar for the current file
+                holder.innerHTML = '<div class="gallery-thumb-inner upload-progress" style="height:' + height + 'px;"><span class="progress-bar"></span><span class="progress" style="width:' + file.percent + '%;"></span><span class="progress-text">' + file.percent + '%</span></div>';
+                return false;
+            });
+
+            // Handle any errors that occur during the upload
+            galleryUploader2.bind('Error', function( up, err ) {
+                document.getElementById('houzez_errors2').innerHTML += "<br/>" + "Error #" + err.code + ": " + err.message;
+            });
+
+            // When a file is uploaded successfully
+            galleryUploader2.bind('FileUploaded', function ( up, file, ajax_response ) {
+                var response = $.parseJSON( ajax_response.response );
+                var thumbHolder   = document.getElementById( "thumb-holder-2-" + file.id );
+
+                if ( response.success ) {
+
+                    document.getElementById( 'houzez_errors2' ).innerHTML = ""; // Clear any previous error messages
+
+                    if( thumbHolder ) {
+
+                        // Add the uploaded image to the gallery and add buttons for setting it as featured and deleting it
+                        var gallery_thumbnail = '<img class="img-fluid" src="' + response.url + '" alt="" />' +
+                        '<div class="upload-gallery-thumb-buttons">'+                        
+                        '<button class="icon icon-delete" data-property-id="'+ 0 +'" data-attachment-id="' + response.attachment_id + '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>'+
+                        '</div>'+
+                        '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' + response.attachment_id + '"/>';
+
+                        thumbHolder.innerHTML = gallery_thumbnail;
+                    }
+
+                } else {
+
+                    if ( thumbHolder ) {
+                        thumbHolder.remove();
+                    }
+                    document.getElementById( 'houzez_errors2' ).innerHTML = response.reason;
+                }
+            });
+
+            // Initialize plupload for uploading gallery images
+            var galleryUploader3 = new plupload.Uploader({
+                browse_button: 'select_brochure_images', // ID of the button to open the file picker dialog
+                file_data_name: 'brochure_upload_file', // name of the file input field
+                container: 'houzez_gallery_dragDrop3', // ID of the container element to add drag-and-drop functionality
+                drop_element: 'houzez_gallery_dragDrop3', // ID of the element to add drop-area functionality
+                url: ajax_url + "?action=houzez_brochure_img_upload&verify_nonce=" + verify_nonce, // URL to handle the image upload
+                filters: {
+                    mime_types : [
+                        { title : verify_file_type, extensions : type_fmktbrch_files } // allowed file types
+                    ],
+                    max_file_size: image_max_file_size, // maximum file size
+                    prevent_duplicates: false // allow or disallow duplicate files
+                }
+            });
+
+            // Initialize the plupload
+            galleryUploader3.init();
+
+            // When files are added to the file queue
+            galleryUploader3.bind('FilesAdded', function(up, files) {
+                
+                var houzez_thumbs = "";
+                var maxfiles = max_mktbrch_files; // maximum number of files allowed
+                var totalFiles  = parseInt($(this.settings.container).find('.uploaded').text()) // current number of files in the gallery
+
+                // Check if the total number of files exceeds the maximum allowed
+                if ( totalFiles >= maxfiles ) {
+                    $( '.max-limit-error3' ).show(); // show error message
+                    up.splice(); // remove the excess files from the file queue
+                    return false;
+
+                } else {
+
+                    var uploads             = files.slice( 0, ( maxfiles - totalFiles ) );
+                    var thumbnailsContainer = document.getElementById( 'houzez_property_brochure_container' );
+
+                    // Add a thumbnail of the file to the gallery
+                    plupload.each( uploads, function ( file ) {
+                        thumbnailsContainer.innerHTML += '<div id="thumb-holder-3-' + file.id + '" class="col-md-2 col-sm-4 col-6 property-thumb houzez-during-upload">' + '' + '</div>';
+                    } );
+
+                    up.refresh();
+                    galleryUploader3.start();
+                }
+
+                // Update the number of uploaded files
+                $( '.upload-image-counter3 .uploaded' ).text( parseInt($(this.settings.container).find('.uploaded').text()) + 1 );
+            });
+
+            // Handle the upload progress
+            galleryUploader3.bind('UploadProgress', function(up, file) {
+
+                var holder     = document.getElementById( "thumb-holder-3-" + file.id ),
+                    imageThumb = $( '.property-thumb' ),
+                    height     = 150;
+
+                if( holder ) {
+
+                    if( imageThumb.length ) {
+                        height = imageThumb.first().height();
+                    }
+                }
+
+                // Update the progress bar for the current file
+                holder.innerHTML = '<div class="gallery-thumb-inner upload-progress" style="height:' + height + 'px;"><span class="progress-bar"></span><span class="progress" style="width:' + file.percent + '%;"></span><span class="progress-text">' + file.percent + '%</span></div>';
+                return false;
+            });
+
+            // Handle any errors that occur during the upload
+            galleryUploader3.bind('Error', function( up, err ) {
+                document.getElementById('houzez_errors3').innerHTML += "<br/>" + "Error #" + err.code + ": " + err.message;
+            });
+
+            // When a file is uploaded successfully
+            galleryUploader3.bind('FileUploaded', function ( up, file, ajax_response ) {
+                var response = $.parseJSON( ajax_response.response );
+                var thumbHolder   = document.getElementById( "thumb-holder-3-" + file.id );
+
+                if ( response.success ) {
+
+                    document.getElementById( 'houzez_errors3' ).innerHTML = ""; // Clear any previous error messages
+
+                    if( thumbHolder ) {
+
+                        // Add the uploaded image to the gallery and add buttons for setting it as featured and deleting it
+                        var gallery_thumbnail = '<img class="img-fluid" src="' + response.url + '" alt="" />' +
+                        '<div class="upload-gallery-thumb-buttons">'+                        
+                        '<button class="icon icon-delete" data-property-id="'+ 0 +'" data-attachment-id="' + response.attachment_id + '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>'+
+                        '</div>'+
+                        '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' + response.attachment_id + '"/>';
+
+                        thumbHolder.innerHTML = gallery_thumbnail;
+                    }
+
+                } else {
+
+                    if ( thumbHolder ) {
+                        thumbHolder.remove();
+                    }
+                    document.getElementById( 'houzez_errors3' ).innerHTML = response.reason;
+                }
+            });
+
+            // Initialize plupload for uploading gallery images
+            var galleryUploader4 = new plupload.Uploader({
+                browse_button: 'select_seller_photo_images', // ID of the button to open the file picker dialog
+                file_data_name: 'seller_photo_upload_file', // name of the file input field
+                container: 'houzez_gallery_dragDrop4', // ID of the container element to add drag-and-drop functionality
+                drop_element: 'houzez_gallery_dragDrop4', // ID of the element to add drop-area functionality
+                url: ajax_url + "?action=houzez_seller_photo_img_upload&verify_nonce=" + verify_nonce, // URL to handle the image upload
+                filters: {
+                    mime_types : [
+                        { title : verify_file_type, extensions : "jpg,jpeg,gif,png,webp" } // allowed file types
+                    ],
+                    max_file_size: image_max_file_size, // maximum file size
+                    prevent_duplicates: false // allow or disallow duplicate files
+                }
+            });
+
+            // Initialize the plupload
+            galleryUploader4.init();
+
+            // When files are added to the file queue
+            galleryUploader4.bind('FilesAdded', function(up, files) {                
+                var houzez_thumbs = "";
+                var maxfiles = 1; // maximum number of files allowed
+                var totalFiles  = parseInt($(this.settings.container).find('.uploaded').text()) // current number of files in the gallery
+
+                // Check if the total number of files exceeds the maximum allowed
+                if ( totalFiles >= maxfiles ) {
+                    $( '.max-limit-error4' ).show(); // show error message
+                    up.splice(); // remove the excess files from the file queue
+                    return false;
+
+                } else {
+
+                    var uploads             = files.slice( 0, ( maxfiles - totalFiles ) );
+                    var thumbnailsContainer = document.getElementById( 'houzez_property_seller_photo_container' );
+
+                    // Add a thumbnail of the file to the gallery
+                    plupload.each( uploads, function ( file ) {
+                        thumbnailsContainer.innerHTML += '<div id="thumb-holder-4-' + file.id + '" class="col-md-2 col-sm-4 col-6 property-thumb houzez-during-upload">' + '' + '</div>';
+                    } );
+
+                    up.refresh();
+                    galleryUploader4.start();
+                }
+
+                // Update the number of uploaded files
+                $( '.upload-image-counter4 .uploaded' ).text( parseInt($(this.settings.container).find('.uploaded').text()) + 1 );
+            });
+
+            // Handle the upload progress
+            galleryUploader4.bind('UploadProgress', function(up, file) {
+
+                var holder     = document.getElementById( "thumb-holder-4-" + file.id ),
+                    imageThumb = $( '.property-thumb' ),
+                    height     = 150;
+
+                if( holder ) {
+
+                    if( imageThumb.length ) {
+                        height = imageThumb.first().height();
+                    }
+                }
+
+                // Update the progress bar for the current file
+                holder.innerHTML = '<div class="gallery-thumb-inner upload-progress" style="height:' + height + 'px;"><span class="progress-bar"></span><span class="progress" style="width:' + file.percent + '%;"></span><span class="progress-text">' + file.percent + '%</span></div>';
+                return false;
+            });
+
+            // Handle any errors that occur during the upload
+            galleryUploader4.bind('Error', function( up, err ) {
+                document.getElementById('houzez_errors4').innerHTML += "<br/>" + "Error #" + err.code + ": " + err.message;
+            });
+
+            // When a file is uploaded successfully
+            galleryUploader4.bind('FileUploaded', function ( up, file, ajax_response ) {
+                var response = $.parseJSON( ajax_response.response );
+                var thumbHolder   = document.getElementById( "thumb-holder-4-" + file.id );
+
+                if ( response.success ) {
+
+                    document.getElementById( 'houzez_errors4' ).innerHTML = ""; // Clear any previous error messages
+
+                    if( thumbHolder ) {
+
+                        // Add the uploaded image to the gallery and add buttons for setting it as featured and deleting it
+                        var gallery_thumbnail = '<img class="img-fluid" src="' + response.url + '" alt="" />' +
+                        '<div class="upload-gallery-thumb-buttons">'+                        
+                        '<button class="icon icon-delete" data-property-id="'+ 0 +'" data-attachment-id="' + response.attachment_id + '"><span class="btn-loader houzez-loader-js"></span><i class="houzez-icon icon-remove-circle"></i></button>'+
+                        '</div>'+
+                        '<input type="hidden" class="propperty-image-id" name="propperty_image_ids[]" value="' + response.attachment_id + '"/>';
+
+                        thumbHolder.innerHTML = gallery_thumbnail;
+                    }
+
+                } else {
+
+                    if ( thumbHolder ) {
+                        thumbHolder.remove();
+                    }
+                    document.getElementById( 'houzez_errors4' ).innerHTML = response.reason;
+                }
+            });
 
             // Set Featured Image
             $( document ).on( 'click', '.icon-featured', function ( e ) {
@@ -1472,7 +1789,9 @@ jQuery(document).ready( function($) {
                 var loader = $this.siblings('.icon-loader');
                 var prop_id = $this.data('property-id');
                 var thumb_id = $this.data('attachment-id');
-
+                var $container = $this.parents('.upload-media-gallery')
+                
+                
                 // Show the loader
                 loader.show();
 
@@ -1499,9 +1818,11 @@ jQuery(document).ready( function($) {
                         // Remove the image from the gallery and update the image counter
                         galleryUploader.removeFile( galleryThumbnail );
                         galleryThumbnail.remove();
-
-                        var galleryItems = $( '.property-thumb' ).length;
-                        $( '.upload-image-counter .uploaded' ).text( galleryItems );
+                        
+                        var galleryItems = $container.find( '.property-thumb' ).length;
+                        console.log($container.siblings('.upload-property-media'));
+                        
+                        ($container.siblings('.upload-property-media')).find( '.uploaded' ).text( galleryItems );
                         $( '.max-limit-error' ).hide();
 
                     } else {
