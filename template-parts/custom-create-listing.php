@@ -129,6 +129,31 @@ if ($fields_builder) {
         .dashboard-add-new-listing .add-new-listing-bottom-nav-wrap{
             z-index: 10;
         }
+        .media-drag-drop{
+            min-height:308px;
+        }
+        span.ft-img-notice {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            bottom: -7rem;
+            padding: 0 10px;
+        }
+        .prop-specific-form-wrapper h3 {
+            font-weight: 600;
+            font-size: 24px;
+        }
+        .prop-specific-form-wrapper h4 {
+            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        .dashboard-content-block-wrap label {
+            max-width: 270px;
+            font-weight: 400;
+            font-size: 14px;
+            line-height: 20px;
+        }
         <?php
         if(! is_admin()){ 
             echo '.dashboard-content-wrap .order-2{
@@ -136,7 +161,7 @@ if ($fields_builder) {
             }';
         } ?>
     </style>
-    <div id="description-price" class="dashboard-content-block-wrap custom-dashboard-layout <?php echo esc_attr($is_multi_steps);?>">
+    <div id="description-price" class="dashboard-content-block-wrap custom-dashboard-layout next-variable-form <?php echo esc_attr($is_multi_steps);?>">
         <div class="dashboard-content-block">
             <div class="row">
                 <?php if( $hide_prop_fields['prop_type'] != 1 ) { ?>
@@ -525,10 +550,10 @@ if ($fields_builder) {
                                 <i class="houzez-icon icon-picture-sun"></i>
                             </div>
                             <div class="upload-image-counter" bis_skin_checked="1"><span class="uploaded"><?php echo esc_attr($property_images_count); ?></span> / <?php echo houzez_option('max_prop_images'); ?></div>
-                            <div>
+                            <div style="position:relative;">
                                 <?php echo houzez_option('cl_drag_drop_title', 'Drag and drop the gallery images here'); ?><br>
                                 <span><?php echo houzez_option('cl_image_size', '(Minimum size 1440x900)'); ?></span><br>
-                                <span><?php echo houzez_option('cl_image_featured', 'To mark an image as featured, click the star icon. If no image is marked as featured, the first image will be considered the featured image.'); ?></span>
+                                <span class="ft-img-notice"><?php echo houzez_option('cl_image_featured', 'To mark an image as featured, click the star icon. If no image is marked as featured, the first image will be considered the featured image.'); ?></span>
                             </div>
                             <a id="select_gallery_images" href="javascript:;" class="btn btn-primary btn-left-icon"><i class="houzez-icon icon-upload-button mr-1"></i> <?php echo houzez_option('cl_image_btn', 'Select and Upload'); ?></a>
                         </div>
@@ -838,6 +863,18 @@ if ($fields_builder) {
         <?php }
         ?>
     </div><!-- dashboard-content-block-wrap -->
+
+
+    <?php
+    if(false): ?>
+        <!-- Step 2 -->
+        <div id="description-price-step2" class="dashboard-content-block-wrap custom-dashboard-layout <?php echo esc_attr($is_multi_steps);?>">
+            <div class="loader"></div>
+        </div><!-- dashboard-content-block-wrap -->
+    <?php
+    endif;
+    ?>
+
     <?php 
 }
 

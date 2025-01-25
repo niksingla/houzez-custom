@@ -871,6 +871,9 @@ jQuery(document).ready( function($) {
             title_length();
         }
 
+        /** Object for storing the ajax forms html */
+        const formsHTML = {};
+
         /* ------------------------------------------------------------------------ */
         /*  START CREATE LISTING FORM STEPS AND VALIDATION
          /* ------------------------------------------------------------------------ */
@@ -970,8 +973,12 @@ jQuery(document).ready( function($) {
 
             });
 
+            /** Auto fill the ajax forms if data is available */
+            function saveFormData(currentForm){                
+            }    
+
             // Next button click action
-            btnnext.click(function(e) {
+            btnnext.click(async function(e) {
                 e.preventDefault();
                 
                 $('html, body').animate({
@@ -982,6 +989,35 @@ jQuery(document).ready( function($) {
                     property_gallery_images();
                 }
 
+                /** Create custom function to fetch next form */
+                function fetchFormStepTemplate(stepNumber) {
+                    var propType = jQuery('#prop_type').val()
+                    return fetch(ajaxurl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'fetch_form_step_template',
+                            prop_type: propType,
+                            step: stepNumber,
+                        }),
+                    })
+                        .then((response) => {
+                            if (!response.ok) {
+                                return false                                
+                            }
+                            return response.text();
+                        })
+                        .then((html) => {
+                            return html; // Returns the HTML block
+                        })
+                        .catch((error) => {
+                            console.error('Fetch error:', error);
+                            return false
+                        });
+                }                            
+                
                 if(current < formStep.length){
                     
                     if($(formStepGal).is(':visible') && gallery_image_req ) {
@@ -995,8 +1031,25 @@ jQuery(document).ready( function($) {
                         }
                     }
                     if(form.valid()){
+                        // saveFormData(current - 1)
                         formStep.removeClass('active').css({display:'none'});
-                        formStep.eq(current++).addClass('active').css({display:'block'});
+                        var is_next_variable_form = formStep.eq(current-1).hasClass('next-variable-form')                        
+                        if(is_next_variable_form){
+                            var propType = $('#prop_type').val();
+
+                            if (formsHTML[propType]) {                                
+                                nextStepHtml = formsHTML[propType];
+                            } else {
+                                var nextStepHtml = await fetchFormStepTemplate(current+1)
+                                nextStepHtml = JSON.parse(nextStepHtml)                        
+                                if(nextStepHtml.success) {
+                                    nextStepHtml = nextStepHtml.data
+                                    formsHTML[propType] = nextStepHtml
+                                }
+                            }
+                            formStep.eq(current++).html($(nextStepHtml)).addClass('active').css({display:'block'})
+                            form.find('select').selectpicker('refresh');                            
+                        } else formStep.eq(current++).addClass('active').css({display:'block'});
                         errorBlock.hide();
                     }else{
                         errorBlock.show();
@@ -1011,7 +1064,9 @@ jQuery(document).ready( function($) {
             btnback.click(function(e){
                 e.preventDefault();
                 errorBlock.hide();
-                
+
+                // saveFormData(current - 1)
+
                 $('html, body').animate({
                     scrollTop: $(".dashboard-content-inner-wrap").offset().top-150
                 }, 'slow');

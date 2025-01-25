@@ -885,3 +885,22 @@ function custom_add_property_enqueue_scripts(){
 	}
 }
 add_action( 'wp_enqueue_scripts', 'custom_add_property_enqueue_scripts' );
+
+function fetch_form_step_template_callback() {
+	if (isset($_POST['step']) && isset($_POST['prop_type'])) {
+		$step = sanitize_text_field($_POST['step']);		
+		
+		if($step){
+			ob_start();        		
+			get_template_part('template-parts/custom-create-listing-step'.$step);
+			$template_html = ob_get_clean();
+			wp_send_json_success($template_html);
+		}
+    } else {
+        wp_send_json_error(__('Invalid step parameter.', 'text-domain'));
+    }
+	wp_send_json_error('No pages found');
+    wp_die();
+}
+add_action('wp_ajax_fetch_form_step_template', 'fetch_form_step_template_callback');
+add_action('wp_ajax_nopriv_fetch_form_step_template', 'fetch_form_step_template_callback');

@@ -83,7 +83,7 @@ if( is_page_template( 'template/user_dashboard_submit.php' ) ) {
             $is_custom_enabled = houzez_option('property_form_sections_custom');
             if(isset($is_custom_enabled) && !empty($is_custom_enabled) && isset($is_custom_enabled['property_form_is_custom']) && $is_custom_enabled['property_form_is_custom']){                                
                 get_template_part('template-parts/custom-create-listing');
-                get_template_part('template-parts/custom-create-listing-step2');
+                // get_template_part('template-parts/custom-create-listing-step2');
             } else {
                 $layout = houzez_option('property_form_sections');
                 $layout = $layout['enabled'];
