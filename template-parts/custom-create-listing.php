@@ -864,17 +864,11 @@ if ($fields_builder) {
         ?>
     </div><!-- dashboard-content-block-wrap -->
 
-
-    <?php
-    if(false): ?>
-        <!-- Step 2 -->
-        <div id="description-price-step2" class="dashboard-content-block-wrap custom-dashboard-layout <?php echo esc_attr($is_multi_steps);?>">
-            <div class="loader"></div>
-        </div><!-- dashboard-content-block-wrap -->
-    <?php
-    endif;
-    ?>
-
+    <!-- Step 2 -->
+    <div id="description-price-step2" class="dashboard-content-block-wrap custom-dashboard-layout <?php echo esc_attr($is_multi_steps);?>">
+        <div class="loader"></div>
+    </div><!-- dashboard-content-block-wrap -->
+    
     <?php 
 }
 

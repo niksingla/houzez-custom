@@ -5,6 +5,8 @@ $overview_data = $overview_data_composer['enabled'];
 $i = 0;
 if ($overview_data) {
 	unset($overview_data['placebo']);
+	?>
+	<?php
 	foreach ($overview_data as $key => $value) { $i ++;
 		if(in_array($key, houzez_overview_composer_fields())) {
 

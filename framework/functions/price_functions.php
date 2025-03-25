@@ -833,6 +833,8 @@ if( !function_exists('houzez_listing_price_v1') ) {
 
             if (!empty( $price_postfix )) {
                 $price_postfix = $price_separator . $price_postfix;
+            } else {
+                $price_postfix = '/mo';
             }
 
             if (!empty( $sale_price ) && !empty( $second_price ) ) {
